@@ -14,16 +14,19 @@ import android.os.Handler
 import android.os.Looper
 import android.os.Message
 import android.util.AttributeSet
+import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.view.accessibility.AccessibilityEvent
 import android.view.accessibility.AccessibilityManager
 import android.view.animation.AccelerateInterpolator
 import android.view.inputmethod.EditorInfo
+import android.view.inputmethod.InputMethodManager
 import android.widget.PopupWindow
 import android.widget.TextView
 import androidx.core.animation.doOnEnd
 import androidx.core.animation.doOnStart
+import androidx.core.content.ContextCompat.getSystemService
 import androidx.emoji2.text.EmojiCompat
 import androidx.emoji2.text.EmojiCompat.EMOJI_SUPPORTED
 import com.simplemobiletools.commons.extensions.*
@@ -161,6 +164,7 @@ class MyKeyboardView @JvmOverloads constructor(context: Context, attrs: Attribut
     private var mUsingSystemTheme: Boolean = true
 
     private var mToolbarHolder: View? = null
+    private var mToolbarHolder1: View? = null
     private var mClipboardManagerHolder: View? = null
     private var mEmojiPaletteHolder: View? = null
     private var emojiCompatMetadataVersion = 0
@@ -308,6 +312,7 @@ class MyKeyboardView @JvmOverloads constructor(context: Context, attrs: Attribut
     /** Sets the top row above the keyboard containing a couple buttons and the clipboard **/
     fun setKeyboardHolder(keyboardHolder: View) {
         mToolbarHolder = keyboardHolder.toolbar_holder
+        mToolbarHolder1 = keyboardHolder.toolbar_holder1
         mClipboardManagerHolder = keyboardHolder.clipboard_manager_holder
         mEmojiPaletteHolder = keyboardHolder.emoji_palette_holder
 
@@ -738,6 +743,26 @@ class MyKeyboardView @JvmOverloads constructor(context: Context, attrs: Attribut
     }
 
     private fun handleClipboard() {
+        mToolbarHolder1?.apply {
+            hello.apply {
+                text = hello.text
+                removeUnderlines()
+                setOnClickListener {
+                    Log.i("gfvfds","hgfds")
+                    mOnKeyboardActionListener!!.onText(hello.text.toString())
+                    vibrateIfNeeded()
+                }
+            }
+            custom_input.setOnClickListener {
+                custom_input.requestFocus()
+            }
+            settings_cog1.setOnClickListener {
+                mOnKeyboardActionListener!!.onText(custom_input.text.toString())
+                custom_input.setText("")
+            }
+            toggleClipboardVisibility(true)
+
+        }
         if (mToolbarHolder != null && mPopupParent.id != R.id.mini_keyboard_view && context.config.showClipboardContent) {
             val clipboardContent = context.getCurrentClip()
             if (clipboardContent?.isNotEmpty() == true) {
